@@ -1,0 +1,25 @@
+{
+  "name": "worker",
+  "module": "./src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun src/index.ts",
+    "build": "tsc",
+    "start": "bun dist/index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/uuid": "^11.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "bullmq": "^5.58.7",
+    "dotenv": "^17.2.2",
+    "ioredis": "^5.7.0",
+    "uuid": "^13.0.0",
+    "zod": "^4.1.11"
+  }
+}
