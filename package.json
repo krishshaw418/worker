@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bun src/index.ts",
     "build": "tsc",
-    "start": "bun dist/index.js"
+    "start": "bun dist/index.js",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@types/bun": "latest",
