@@ -1,8 +1,11 @@
 import * as z from "zod";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+// import fs from "fs";
+// import path from "path";
+// import { fileURLToPath } from "url";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from "./s3Client";
+// import { Upload } from "@aws-sdk/lib-storage";
 
 const InputFormat = z.object({
   prompt: z.string(),
@@ -55,11 +58,35 @@ export async function ImaGen(input: InputFormatType): Promise<1 | string> {
       const arrayBuffer = await data.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const fileName = `${uuidv4()}.png`;
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-      const filePath = path.join(__dirname, "../images", fileName);
-      fs.mkdirSync(path.dirname(filePath), { recursive: true });
-      fs.writeFileSync(filePath, buffer);
+      try {
+        await s3Client.send(new PutObjectCommand({
+          Bucket: process.env.BUCKET_NAME!,
+          Key: `uploads/${fileName}`,
+          Body: buffer,
+          ContentType: "image/png"
+        }))
+        console.log("Upload successful!");
+      } catch (error: any) {
+        switch (error.name) {
+          case "CredentialsProviderError":
+            console.error("Invalid credentials (check R2 keys).");
+            break;
+          case "AccessDenied":
+            console.error("No access to bucket (check bucket policy / permissions).");
+            break;
+          case "NoSuchBucket":
+            console.error("Bucket does not exist.");
+            break;
+          default:
+          console.error("Unexpected error:", error);
+        }
+        return error.name;
+      }
+      // const __filename = fileURLToPath(import.meta.url);
+      // const __dirname = path.dirname(__filename);
+      // const filePath = path.join(__dirname, "../images", fileName);
+      // fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      // fs.writeFileSync(filePath, buffer);
     }
     return 1;
   } catch (error) {
