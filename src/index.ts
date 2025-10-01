@@ -13,12 +13,33 @@ const worker = new Worker(
     { connection: getRedisClient() }
 );
 
-worker.on("completed", (job, returnedValue) => {
-    if(returnedValue !== 1) {
-        console.log(`Failed to process request with jobId ${job.id} due to: ${returnedValue}`);
+worker.on("completed", async (job, returnedValue) => {
+    if(returnedValue.success === false) {
+        console.log(`Failed to process request with jobId ${job.id} due to: ${returnedValue.error}`);
     }
     else {
-        console.log(`Job ${job.id} processed successfully!`);
+        try {
+            const response = await fetch(process.env.RENDER_EXTERNAL_URL!, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ imgUrl: returnedValue.url, validity: 3600 })
+            })
+            if(!response.ok) {
+                console.log("Error sending result to bot!");
+            }
+            else{
+                const data = await response.json();
+                console.log(data);
+            }
+        } catch (error) {
+            console.log("Error: ", error);
+        }
+        console.log({
+            url: returnedValue.url,
+            message: `Job ${job.id} processed successfully!`
+        });
     }
 });
 
