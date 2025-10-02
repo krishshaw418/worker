@@ -8,7 +8,8 @@ const worker = new Worker(
     "requestQueue",
     async (job) => {
         console.log(`processing jobId ${job.id}: `, job.data);
-        return await ImaGen(job.data);
+        const input = {prompt: job.data.prompt, style: job.data.style}
+        return await ImaGen(input);
     },
     { connection: getRedisClient() }
 );
@@ -24,7 +25,7 @@ worker.on("completed", async (job, returnedValue) => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ imgUrl: returnedValue.url, validity: 3600 })
+                body: JSON.stringify({ imgUrl: returnedValue.url, validity: 3600, chatId: job.data.chatId })
             })
             if(!response.ok) {
                 console.log("Error sending result to bot!");
