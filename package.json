@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun src/worker.ts",
     "build": "tsc",
-    "start": "bun dist/index.js",
+    "start": "bun dist/worker.js",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
