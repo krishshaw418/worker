@@ -3,6 +3,15 @@ dotenv.config();
 import { Worker } from "bullmq";
 import { getRedisClient } from "./utils/redis";
 import { ImaGen } from "./utils/image-generation";
+import express from "express";
+
+const app = express();
+
+const port = process.env.PORT;
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
 
 const worker = new Worker(
     "requestQueue",
