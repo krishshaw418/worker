@@ -7,9 +7,9 @@ import express from "express";
 
 const app = express();
 
-const port = process.env.PORT;
+const port = Number(process.env.PORT);
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on port ${port}`);
 });
 
