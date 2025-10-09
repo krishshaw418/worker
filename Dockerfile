@@ -12,4 +12,6 @@ COPY . .
 
 RUN bun run build
 
+EXPOSE 8082
+
 CMD ["bun", "start"]
